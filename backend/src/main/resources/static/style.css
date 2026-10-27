@@ -1,0 +1,181 @@
+/* AI-Based Highway Animal Detection and Driver Alert System
+   Design idea: a coachbuilt instrument panel. Pure black, ivory type, one fine gold line (the coachline)
+   under the header that takes the colour of the latest alert. Fonts are bundled in /fonts, so it looks the same offline. */
+
+@font-face { font-family: "Cormorant Garamond"; font-weight: 300; font-style: normal; font-display: swap;
+  src: url("fonts/cormorant-garamond-latin-300-normal.woff2") format("woff2"); }
+@font-face { font-family: "Cormorant Garamond"; font-weight: 400; font-style: normal; font-display: swap;
+  src: url("fonts/cormorant-garamond-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Cormorant Garamond"; font-weight: 400; font-style: italic; font-display: swap;
+  src: url("fonts/cormorant-garamond-latin-400-italic.woff2") format("woff2"); }
+@font-face { font-family: "Cormorant Garamond"; font-weight: 500; font-style: normal; font-display: swap;
+  src: url("fonts/cormorant-garamond-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-weight: 100 900; font-style: normal; font-display: swap;
+  src: url("fonts/inter-latin-wght-normal.woff2") format("woff2"); }
+
+:root {
+  --ink: #000000;
+  --recess: #0a0a09;
+  --hairline: #2b2618;
+  --hairline-strong: #4a4126;
+  --ivory: #f1ead8;
+  --mist: #a39c8a;
+  --quiet: #857e6d;
+  --champagne: #d4af37;
+  --safe: #6fbf8f;
+  --caution: #e8a93b;
+  --danger: #e5484d;
+  --serif: "Cormorant Garamond", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+  --sans: "Inter", system-ui, "Segoe UI", Roboto, sans-serif;
+  --page: 1180px;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { background: var(--ink); }
+body {
+  margin: 0; background: var(--ink); color: var(--ivory);
+  font: 15px/1.6 var(--sans); font-feature-settings: "cv11", "ss03"; -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible { outline: 2px solid var(--champagne); outline-offset: 3px; }
+
+/* ---------- header ---------- */
+.masthead {
+  max-width: var(--page); margin: 0 auto; padding: 64px 28px 34px;
+  display: flex; flex-wrap: wrap; gap: 28px 48px; justify-content: space-between; align-items: flex-end;
+}
+h1 {
+  margin: 0; max-width: 15em; font: 300 clamp(2.1rem, 4.6vw, 3.55rem)/1.07 var(--serif); letter-spacing: -0.012em;
+}
+.sub { margin: 16px 0 0; max-width: 40ch; font: italic 400 1.3rem/1.4 var(--serif); color: var(--mist); }
+.status { list-style: none; display: flex; gap: 22px; margin: 0; padding: 0 0 6px; font-size: 13px; color: var(--mist); }
+.status li { display: flex; align-items: center; gap: 9px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hairline-strong); }
+.dot.up { background: var(--safe); box-shadow: 0 0 0 3px rgba(111, 191, 143, .16); }
+.dot.down { background: var(--danger); box-shadow: 0 0 0 3px rgba(229, 72, 77, .18); }
+
+/* The coachline: quiet gold normally, the alert colour when something is found. */
+.coachline { height: 1px; width: 100%; background: var(--champagne); opacity: .8;
+  transition: background-color .6s ease, opacity .6s ease, box-shadow .6s ease; }
+.coachline[data-level="SAFE"] { background: var(--safe); opacity: 1; }
+.coachline[data-level="CAUTION"] { background: var(--caution); opacity: 1; }
+.coachline[data-level="DANGER"] { background: var(--danger); opacity: 1; height: 2px; box-shadow: 0 0 16px rgba(229, 72, 77, .5); }
+
+/* ---------- layout ---------- */
+main {
+  max-width: var(--page); margin: 0 auto; padding: 48px 28px 8px;
+  display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 64px;
+}
+main > section.wide { grid-column: 1 / -1; border-top: 1px solid var(--hairline); padding-top: 40px; margin-top: 8px; }
+
+h2 { margin: 0 0 22px; font: 400 1.95rem/1.15 var(--serif); letter-spacing: .005em; }
+h3 { margin: 0 0 14px; font: 500 13px/1.4 var(--sans); color: var(--mist); }
+
+/* ---------- forms ---------- */
+label { display: block; margin: 24px 0 8px; font-size: 13px; font-weight: 500; color: var(--mist); }
+label.check-option { display: flex; align-items: center; gap: 10px; margin-top: 22px; font-size: 14px; font-weight: 400; color: var(--ivory); }
+input[type=checkbox] { accent-color: var(--champagne); width: 16px; height: 16px; }
+input[type=file], input[type=text] {
+  width: 100%; padding: 11px 12px; background: var(--recess); color: var(--ivory);
+  border: 1px solid var(--hairline); border-radius: 3px; font: inherit; font-size: 14px;
+}
+input[type=text]::placeholder { color: #6e6755; }
+input[type=file]::file-selector-button {
+  margin-right: 14px; padding: 6px 14px; background: transparent; color: var(--ivory);
+  border: 1px solid var(--hairline-strong); border-radius: 3px; font: inherit; font-size: 13px; cursor: pointer;
+  transition: border-color .2s, color .2s;
+}
+input[type=file]:not(:disabled)::file-selector-button:hover { border-color: var(--champagne); color: var(--champagne); }
+input[type=file]:disabled { opacity: .45; }
+
+button {
+  margin-top: 26px; padding: 11px 24px; border-radius: 3px; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer;
+  transition: background-color .2s, border-color .2s, color .2s;
+}
+button:disabled { opacity: .35; cursor: default; }
+button.primary { background: var(--champagne); color: #120e02; border: 1px solid var(--champagne); }
+button.primary:not(:disabled):hover { background: #e6c456; border-color: #e6c456; }
+button.secondary { background: transparent; color: var(--ivory); border: 1px solid var(--hairline-strong); }
+button.secondary:not(:disabled):hover { border-color: var(--champagne); color: var(--champagne); }
+button.small { margin: 0; padding: 7px 16px; font-size: 13px; }
+.button-row { display: flex; flex-wrap: wrap; gap: 12px; }
+.button-row button { margin-top: 18px; }
+.button-row + .button-row button { margin-top: 12px; }
+
+.note { margin: 16px 0 0; font-size: 13px; color: var(--mist); }
+.note.fine { font-size: 12.5px; line-height: 1.6; color: var(--quiet); }
+.note.numbers { font-variant-numeric: tabular-nums; }
+.note:empty { display: none; }
+
+/* ---------- the alert sentence ---------- */
+.banner {
+  --tone: var(--hairline-strong);
+  min-height: 3.4rem; margin: 0 0 24px; padding: 4px 0 4px 20px; border-left: 2px solid var(--tone);
+  font: 500 clamp(1.35rem, 2.3vw, 1.8rem)/1.25 var(--serif); color: var(--ivory);
+  display: flex; align-items: center;
+  transition: border-color .4s ease;
+}
+.banner.idle { font-style: italic; font-weight: 400; color: var(--mist); }
+.banner.SAFE { --tone: var(--safe); }
+.banner.CAUTION { --tone: var(--caution); }
+.banner.DANGER { --tone: var(--danger); animation: breathe 1.5s ease-in-out 2; }
+@keyframes breathe { 50% { opacity: .6; } }
+
+/* ---------- picture frames ---------- */
+.frame { padding: 10px; background: var(--recess); border: 1px solid var(--hairline); border-radius: 4px; }
+canvas { display: block; width: 100%; height: auto; background: #050505; border-radius: 2px; }
+.stage { position: relative; min-height: 200px; overflow: hidden; border-radius: 2px; background: #030303; }
+.stage video { display: block; width: 100%; height: auto; }
+.stage canvas.overlay { position: absolute; inset: 0; width: 100%; height: 100%; background: transparent; border-radius: 0; pointer-events: none; }
+
+.live-layout { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 64px; }
+.live-controls label:first-child { margin-top: 0; }
+
+/* ---------- statistics ---------- */
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; }
+.bars .bar { display: grid; grid-template-columns: 96px 1fr 40px; gap: 16px; align-items: center; margin: 14px 0; font-size: 14px; }
+.bars .bar > span:last-child { text-align: right; font-variant-numeric: tabular-nums; color: var(--mist); }
+.bars .track { height: 3px; background: var(--hairline); border-radius: 2px; overflow: hidden; }
+.bars .fill { height: 100%; background: var(--champagne); }
+.bars .fill.SAFE { background: var(--safe); }
+.bars .fill.CAUTION { background: var(--caution); }
+.bars .fill.DANGER { background: var(--danger); }
+.empty { margin: 4px 0; font: italic 400 1.15rem/1.4 var(--serif); color: var(--quiet); }
+
+/* ---------- history ---------- */
+.row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.row h2 { margin: 0; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th { padding: 12px 16px 12px 0; text-align: left; font-size: 13px; font-weight: 500; color: var(--mist); border-bottom: 1px solid var(--hairline-strong); white-space: nowrap; }
+td { padding: 15px 16px 15px 0; border-bottom: 1px solid var(--hairline); white-space: nowrap; }
+td:first-child { font-variant-numeric: tabular-nums; color: var(--mist); }
+.pill {
+  --tone: var(--mist);
+  display: inline-flex; align-items: center; gap: 8px; padding: 2px 13px 2px 11px; border: 1px solid var(--tone);
+  border-radius: 999px; font-size: 12.5px; font-weight: 500; color: var(--tone);
+}
+.pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--tone); }
+.pill.SAFE { --tone: var(--safe); }
+.pill.CAUTION { --tone: var(--caution); }
+.pill.DANGER { --tone: var(--danger); }
+
+footer { max-width: var(--page); margin: 48px auto 0; padding: 0 28px 64px; }
+footer p { margin: 0; padding-top: 28px; border-top: 1px solid var(--hairline); padding-right: 25%; font-size: 13px; color: var(--quiet); }
+
+/* ---------- smaller screens ---------- */
+@media (max-width: 900px) {
+  main, .live-layout { grid-template-columns: minmax(0, 1fr); gap: 36px; }
+  .masthead { padding-top: 44px; }
+}
+@media (max-width: 600px) {
+  .masthead, main, footer { padding-left: 20px; padding-right: 20px; }
+  .two { grid-template-columns: 1fr; gap: 28px; }
+  .status { flex-wrap: wrap; gap: 12px 20px; }
+  h2 { font-size: 1.65rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

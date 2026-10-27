@@ -1,0 +1,38 @@
+# Build and Python environments
+target/
+venv/
+.venv/
+__pycache__/
+*.pyc
+.idea/
+.vscode/
+
+# Model file (big; download_model.py fetches it)
+*.onnx
+*.pt
+*.pth
+
+# Videos and your own test photos (the iStock clip must never go to GitHub)
+*.mp4
+*.webm
+*.mov
+*.avi
+*.mkv
+my_photos/
+samples/
+demo/
+
+# Logs and secrets
+*.log
+logs/
+.env
+.env.*
+*.pem
+*.key
+application-local.properties
+
+# Output files
+results.csv
+*.zip
+detector/test_frame.jpg
+detector/test_frame.jpg
