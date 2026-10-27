@@ -489,3 +489,21 @@ loadHealth();
 loadHistory();
 loadStats();
 setInterval(loadHealth, 10000);
+
+
+// ---------- which picture is on show (only matters on the one-screen PC layout) ----------
+function setView(view) {
+  $("board").dataset.view = view;
+  for (const tab of document.querySelectorAll(".tab[data-view]")) {
+    tab.setAttribute("aria-pressed", String(tab.dataset.view === view));
+  }
+  if (view === "photo" && !$("vstop").disabled) $("vstop").click();   // do not keep analysing a hidden video
+}
+for (const tab of document.querySelectorAll(".tab[data-view]")) {
+  tab.addEventListener("click", () => setView(tab.dataset.view));
+}
+$("image").addEventListener("change", () => setView("photo"));
+$("form").addEventListener("submit", () => setView("photo"));
+$("vfile").addEventListener("change", () => setView("live"));
+$("vcam").addEventListener("click", () => setView("live"));
+$("vstart").addEventListener("click", () => setView("live"));

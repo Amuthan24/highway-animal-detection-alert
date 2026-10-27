@@ -24,7 +24,9 @@
   <!-- The coachline: one fine line under the header. It takes the colour of the latest alert. -->
   <div class="coachline" id="coachline" data-level="idle" role="presentation"></div>
 
-  <main>
+  <!-- On a big screen everything fits in one view: controls on the left, the picture in the middle,
+       numbers and history on the right. On a phone the sections simply stack in this order. -->
+  <main id="board" data-view="photo">
     <section class="check" aria-labelledby="check-title">
       <h2 id="check-title">Check a photo</h2>
       <form id="form">
@@ -40,47 +42,52 @@
       </form>
     </section>
 
-    <section class="result" aria-labelledby="result-title">
+    <section class="stage-photo" aria-labelledby="result-title">
+      <div class="view-switch" role="group" aria-label="What to show">
+        <button type="button" class="tab" data-view="photo" aria-pressed="true">Photo</button>
+        <button type="button" class="tab" data-view="live" aria-pressed="false">Video and webcam</button>
+      </div>
       <h2 id="result-title">Result</h2>
       <div id="banner" class="banner idle" role="alert" aria-live="assertive">Choose a photo to begin.</div>
       <div class="frame"><canvas id="canvas" width="640" height="360" aria-label="Photo with detected animals marked"></canvas></div>
       <p id="meta" class="note"></p>
     </section>
 
-    <section class="live wide" aria-labelledby="video-title">
+    <section class="live-controls" aria-labelledby="video-title">
       <h2 id="video-title">Video and webcam</h2>
-      <div class="live-layout">
-        <div class="live-controls">
-          <label for="vfile">Dashcam clip (mp4 or webm)</label>
-          <input type="file" id="vfile" accept="video/mp4,video/webm">
-          <div class="button-row">
-            <button type="button" id="vcam" class="secondary">Use webcam instead</button>
-            <button type="button" id="vcamoff" class="secondary" hidden>Turn off camera</button>
-          </div>
-          <div class="button-row">
-            <button type="button" id="vstart" class="primary" disabled>Start</button>
-            <button type="button" id="vstop" class="secondary" disabled>Stop</button>
-          </div>
-          <p id="vmeta" class="note numbers"></p>
-          <p id="vsave" class="note"></p>
-          <p class="note fine">Only important moments are saved to History: when an animal first appears, or the alert gets worse, at most once every 5 seconds.
-            Boxes lag a little behind the picture because each frame takes time to analyse.</p>
-          <p class="note fine">The camera stays on until you press "Turn off camera" or choose a clip. Small still frames go only to the
-            backend and detector on this computer. Nothing is recorded.</p>
-        </div>
-        <div class="live-stage">
-          <div id="vbanner" class="banner idle" role="alert" aria-live="assertive">Choose a video clip or press "Use webcam instead" to begin.</div>
-          <div class="frame">
-            <div class="stage">
-              <video id="video" muted playsinline></video>
-              <canvas id="overlay" class="overlay" width="640" height="360"></canvas>
-            </div>
-          </div>
+      <label for="vfile">Dashcam clip (mp4 or webm)</label>
+      <input type="file" id="vfile" accept="video/mp4,video/webm">
+      <div class="button-row">
+        <button type="button" id="vcam" class="secondary">Use webcam instead</button>
+        <button type="button" id="vcamoff" class="secondary" hidden>Turn off camera</button>
+      </div>
+      <div class="button-row">
+        <button type="button" id="vstart" class="primary" disabled>Start</button>
+        <button type="button" id="vstop" class="secondary" disabled>Stop</button>
+      </div>
+      <p id="vmeta" class="note numbers"></p>
+      <p id="vsave" class="note"></p>
+      <p class="note fine">Only important moments are saved to History: when an animal first appears, or the alert gets worse, at most once every 5 seconds.
+        Boxes lag a little behind the picture because each frame takes time to analyse.</p>
+      <p class="note fine">The camera stays on until you press "Turn off camera" or choose a clip. Small still frames go only to the
+        backend and detector on this computer. Nothing is recorded.</p>
+    </section>
+
+    <section class="stage-live" aria-label="Live video">
+      <div class="view-switch" role="group" aria-label="What to show">
+        <button type="button" class="tab" data-view="photo" aria-pressed="false">Photo</button>
+        <button type="button" class="tab" data-view="live" aria-pressed="true">Video and webcam</button>
+      </div>
+      <div id="vbanner" class="banner idle" role="alert" aria-live="assertive">Choose a video clip or press "Use webcam instead" to begin.</div>
+      <div class="frame">
+        <div class="stage">
+          <video id="video" muted playsinline></video>
+          <canvas id="overlay" class="overlay" width="640" height="360"></canvas>
         </div>
       </div>
     </section>
 
-    <section class="seen wide" aria-labelledby="stats-title">
+    <section class="seen" aria-labelledby="stats-title">
       <h2 id="stats-title">What the database has seen</h2>
       <div class="two">
         <div>
@@ -94,7 +101,7 @@
       </div>
     </section>
 
-    <section class="history wide" aria-labelledby="history-title">
+    <section class="history" aria-labelledby="history-title">
       <div class="row">
         <h2 id="history-title">History</h2>
         <button type="button" id="clear" class="secondary small">Clear history</button>
